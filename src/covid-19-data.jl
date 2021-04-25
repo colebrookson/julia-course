@@ -1,30 +1,62 @@
+########## 
+##########
+# This code is for the 1st pset for course 6.S083 Computational Thinking held
+# at MIT and offered online freely 
+##########
+##########
+# AUTHOR: Cole B. Brookson
+# DATE OF CREATION: 2021-04-25
+##########
+##########
 
-
+# set up =======================================================================
 
 # set packages
 using CSV, DataFrames, Plots, Dates
 # set url for the covid data location
-url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_cov
+id_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
 
 # grab the data
 download(url, "covid_data.csv")
 readdir()
-
-# read in data
- data = CSV.read("covid_data.csv", DataFrame)
+data = CSV.read("covid_data.csv", DataFrame)
 
 # find unique countries in the dataset
-rename!(data, 1 => "province", 2 => "country" ) # ! is a convention: function *modifies* it's argument it doesn't create a new thing
+rename!(data, 1 => "province", 2 => "country" ) 
 
-# how many cases in the united states
-all_countries = collect(data[:, 2])
-unique_countries = unique(countries)
-list_of_countries = ["US", "United Kingdom", "South Korea", "China", "Japan", "France", "Germany", "India"]
-countries_data = filter(row -> row.country ∈ list_of_countries, data)
-num_days = ncol(data[:,5:end])
+countries = ["US", "United Kingdom", "South Korea", "China", "Japan", 
+            "France", "Germany", "India"]
+countries_data = filter(row -> row.country ∈ countries, data)
+num_days = ncol(data[:,5:end]) # number of days in the dataset
 
-#accumulate data for places split into territories
-zeros_US = 
+# accumulate data for places split into territories ============================
+
+# initialize countries dictionary
+countries_dict = Dict{String,Vector}(
+    "US" => zeros(ncol(data[:,5:end])),
+    "United Kingdom" => zeros(ncol(data[:,5:end])),
+    "South Korea" => zeros(ncol(data[:,5:end])),
+    "China" => zeros(ncol(data[:,5:end])),
+    "Japan" => zeros(ncol(data[:,5:end])),
+    "France" => zeros(ncol(data[:,5:end])),
+    "Germany" => zeros(ncol(data[:,5:end])),
+    "India" => zeros(ncol(data[:,5:end]))
+);
+
+# loop through the countries and days and add up the cases 
+for country in countries
+
+    temp_df = filter(row -> row.country == "United Kingdom", data);
+    countries_dict[country] = [sum(temp_df[!, i]) for i in 5:size(temp_df,2)]
+
+end
+
+# plot all data ================================================================
+
+# initialize empty plot
+p = plot()
+
 
 
 U_countries = [startswith(country, "U") for country in countries]; # use array comprehension
